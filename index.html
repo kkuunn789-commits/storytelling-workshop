@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kids' Storytelling Workshop | 兒童英語說故事工作坊</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Chosen Palette: Warm & Playful -->
@@ -20,15 +19,6 @@
         .card-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 250px;
-            max-height: 300px;
         }
         .keyword-tag {
             cursor: pointer;
@@ -279,14 +269,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Educational Chart (Pacing) -->
-        <section class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 max-w-4xl mx-auto">
-             <h3 class="text-center text-slate-500 font-bold uppercase tracking-wider text-sm mb-4">The Secret Formula</h3>
-             <div class="chart-container" style="height: 200px;">
-                <canvas id="pacingChart"></canvas>
             </div>
         </section>
 
@@ -587,7 +569,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initGrid();
-            initPacingChart();
             drawTimerCircle(1);
             setTimeout(dismissOverlay, 500); 
         });
@@ -683,23 +664,6 @@
                     </div>
                 `;
                 grid.appendChild(card);
-            });
-        }
-
-        // --- CHARTS ---
-        function initPacingChart() {
-            const ctx = document.getElementById('pacingChart').getContext('2d');
-            pacingChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Prob/Sol (30s)', 'Ending (30s)'],
-                    datasets: [{
-                        data: [30, 30],
-                        backgroundColor: ['#f87171', '#4ade80'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
             });
         }
 
