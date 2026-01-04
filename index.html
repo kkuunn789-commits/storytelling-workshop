@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids' Storytelling Workshop | 兒童英語說故事工作坊</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Chosen Palette: Warm & Playful -->
+    <!-- Primary Background: Warm Cream (bg-orange-50) -->
+    
+    <style>
+        body {
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+            background-color: #fff7ed; /* orange-50 */
+            font-size: 18px; /* Large base font size */
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+        .keyword-tag {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .keyword-tag.selected {
+            background-color: #fb923c; /* orange-400 */
+            color: white;
+            transform: scale(1.02);
+        }
+        /* Custom scrollbar */
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: #f1f1f1; }
+        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        .step-active { border-bottom: 4px solid #fb923c; color: #c2410c; }
+        .hidden-section { display: none; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* iOS Help Overlay Styles */
+        #ios-help-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #fff7ed; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px; font-family: sans-serif; color: #475569;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- iOS Instruction Overlay -->
+    <div id="ios-help-overlay">
+        <div style="font-size: 60px; margin-bottom: 20px;">🦁</div>
+        <h2 style="font-size: 28px; font-weight: bold; color: #ea580c; margin-bottom: 15px;">無法顯示嗎？</h2>
+        <p style="font-size: 18px; line-height: 1.6; max-width: 320px; margin-bottom: 30px;">
+            iPad 的「檔案預覽」可能無法執行此教材的互動功能。
+            <br><br>
+            <strong>請依照以下步驟開啟：</strong>
+            <br>
+            1. 點選螢幕右上角的 <span style="font-size: 24px;">⬆️</span> (分享) 圖示。
+            <br>
+            2. 選擇 <strong>「在 Safari 中開啟」</strong>。
+        </p>
+        <button onclick="dismissOverlay()" style="padding: 14px 28px; background-color: #cbd5e1; color: white; border: none; border-radius: 50px; font-size: 16px; font-weight: bold;">
+            我已經在瀏覽器中了 (強制進入)
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-4xl">🦁</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-orange-600 tracking-wide">Storytelling Workshop</h1>
+            </div>
+            <button onclick="scrollToTop()" class="text-base font-bold text-slate-500 hover:text-orange-500 transition">
+                Start Over ↺
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- Intro Section -->
+        <section id="intro" class="space-y-6 text-center">
+            <div class="bg-white p-8 rounded-3xl shadow-lg border-2 border-orange-100">
+                <h2 class="text-4xl font-bold text-slate-800 mb-6">Choose Your Character! 🌍</h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                    現在我們有 <span class="font-bold text-orange-500">27 個獨特的角色</span>！
+                    <br>觀察卡片上的圖片線索：<span class="font-bold text-indigo-500">左格是角色</span>，<span class="font-bold text-emerald-500">右格是場景</span>。
+                </p>
+                
+                <!-- Mini Legend -->
+                <div class="mt-6 flex flex-wrap justify-center gap-6 text-sm font-bold text-slate-400 uppercase tracking-widest">
+                    <span class="flex items-center"><div class="w-4 h-4 rounded-full bg-yellow-400 mr-2"></div>Funny</span>
+                    <span class="flex items-center"><div class="w-4 h-4 rounded-full bg-purple-400 mr-2"></div>Magical</span>
+                    <span class="flex items-center"><div class="w-4 h-4 rounded-full bg-blue-400 mr-2"></div>Daily</span>
+                    <span class="flex items-center"><div class="w-4 h-4 rounded-full bg-red-400 mr-2"></div>Action</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scenario Selection Grid (Modified: 2 cols on medium+) -->
+        <section id="selection">
+            <div id="scenario-grid" class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Javascript will populate this grid -->
+            </div>
+        </section>
+
+        <!-- Workspace Section -->
+        <section id="workspace" class="hidden-section bg-white rounded-3xl shadow-xl border-2 border-slate-100 overflow-hidden mb-20">
+            
+            <!-- Header -->
+            <div id="workspace-header" class="bg-slate-800 text-white p-6 flex justify-between items-center transition-colors duration-500">
+                <div>
+                    <span class="uppercase tracking-widest text-sm font-bold text-white/60 mb-1 block">Current Story</span>
+                    <h2 id="scenario-title" class="text-3xl font-bold">Title</h2>
+                </div>
+                <div class="text-6xl" id="scenario-icon">✨</div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-200">
+                <button onclick="switchTab('brainstorm')" id="tab-brainstorm" class="flex-1 py-5 text-center text-lg font-bold text-slate-500 hover:bg-slate-50 transition step-active">1. Brainstorm 🧠</button>
+                <button onclick="switchTab('build')" id="tab-build" class="flex-1 py-5 text-center text-lg font-bold text-slate-500 hover:bg-slate-50 transition">2. Build ✍️</button>
+                <button onclick="switchTab('practice')" id="tab-practice" class="flex-1 py-5 text-center text-lg font-bold text-slate-500 hover:bg-slate-50 transition">3. Practice ⏱️</button>
+            </div>
+
+            <div class="p-6 md:p-8 min-h-[500px]">
+                
+                <!-- TAB 1: BRAINSTORM -->
+                <div id="content-brainstorm" class="fade-in space-y-8">
+                    <div class="bg-orange-50 p-6 rounded-xl border border-orange-100 flex items-start gap-4">
+                        <div class="text-3xl">💡</div>
+                        <div>
+                            <p class="text-orange-800 text-xl font-bold">Word Bank</p>
+                            <p class="text-base text-orange-600">Click the keywords below to help you think!</p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Left Column: Character & Setting -->
+                        <div class="space-y-8">
+                            
+                            <!-- Character Block -->
+                            <div>
+                                <h3 class="text-base font-bold uppercase text-slate-400 mb-2">Character (Who?)</h3>
+                                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-4 shadow-sm">
+                                    <p id="brainstorm-char-text" class="text-xl text-indigo-900 font-bold leading-relaxed">
+                                        <!-- Text populated by JS -->
+                                    </p>
+                                </div>
+                                <h3 class="text-sm font-bold uppercase text-slate-400 mb-3 tracking-wider">Keywords</h3>
+                                <div id="words-character" class="flex flex-wrap gap-3"></div>
+                            </div>
+
+                            <!-- Setting Block -->
+                            <div>
+                                <h3 class="text-base font-bold uppercase text-slate-400 mb-2">Setting (Where?)</h3>
+                                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-4 shadow-sm">
+                                    <p id="brainstorm-set-text" class="text-xl text-emerald-900 font-bold leading-relaxed">
+                                        <!-- Text populated by JS -->
+                                    </p>
+                                </div>
+                                <h3 class="text-sm font-bold uppercase text-slate-400 mb-3 tracking-wider">Keywords</h3>
+                                <div id="words-setting" class="flex flex-wrap gap-3"></div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Problem Sentence + Keywords -->
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="text-base font-bold uppercase text-red-400 mb-2">The Problem (What is wrong?)</h3>
+                                <div class="bg-red-50 p-6 rounded-2xl border-2 border-red-100 mb-6 shadow-sm relative overflow-hidden">
+                                    <div class="absolute -right-4 -top-4 text-9xl text-red-100 opacity-50 select-none">!</div>
+                                    <p id="brainstorm-prob-text" class="text-2xl text-red-900 font-medium italic leading-relaxed relative z-10">
+                                        <!-- Text populated by JS -->
+                                    </p>
+                                </div>
+
+                                <h3 class="text-sm font-bold uppercase text-red-400 mb-3 tracking-wider">Problem Keywords</h3>
+                                <div id="words-problem" class="flex flex-wrap gap-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end pt-4"><button onclick="switchTab('build')" class="bg-orange-500 hover:bg-orange-600 text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">Next: Write Story ➔</button></div>
+                </div>
+
+                <!-- TAB 2: BUILD -->
+                <div id="content-build" class="hidden-section fade-in space-y-8">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400 mb-6">
+                        <p class="text-blue-800 font-bold">📝 Story Planner (Lesson 4)</p>
+                        <p class="text-sm text-blue-600">Use your keywords to finish the sentences!</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm">
+                                <h3 class="text-lg font-bold text-red-600 mb-2">1. The Problem</h3>
+                                <p class="text-sm text-slate-400 mb-3">What went wrong?</p>
+                                <textarea id="story-prob" class="w-full h-32 p-3 rounded-lg border border-red-200 focus:ring-2 focus:ring-red-300 outline-none text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border-2 border-green-100 shadow-sm">
+                                <h3 class="text-lg font-bold text-green-600 mb-2">2. The Solution</h3>
+                                <p class="text-sm text-slate-400 mb-3">What was the main idea to fix it?</p>
+                                <textarea id="story-sol" class="w-full h-32 p-3 rounded-lg border border-green-200 focus:ring-2 focus:ring-green-300 outline-none text-lg leading-relaxed"></textarea>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm">
+                                <h3 class="text-lg font-bold text-purple-600 mb-2">3. Two Details (Action Steps)</h3>
+                                <p class="text-sm text-slate-400 mb-3">Describe two specific things about the solution.</p>
+                                <div class="space-y-4">
+                                    <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                        <label class="block text-xs font-bold text-purple-400 uppercase mb-1">Detail 1</label>
+                                        <textarea id="story-det1" class="w-full h-20 p-2 rounded border border-purple-200 focus:ring-2 focus:ring-purple-300 outline-none text-base mb-2" placeholder="What exactly happened?"></textarea>
+                                        <div class="flex items-center space-x-4 text-sm mt-2 pt-2 border-t border-purple-100">
+                                            <span class="font-bold text-slate-500">Does it work? (成功了嗎?)</span>
+                                            <label class="inline-flex items-center cursor-pointer hover:bg-white px-2 py-1 rounded transition"><input type="radio" name="work1" value="yes" class="form-radio text-green-500"><span class="ml-2 text-slate-700">Yes (O)</span></label>
+                                            <label class="inline-flex items-center cursor-pointer hover:bg-white px-2 py-1 rounded transition"><input type="radio" name="work1" value="no" class="form-radio text-red-500"><span class="ml-2 text-slate-700">No (X)</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                        <label class="block text-xs font-bold text-purple-400 uppercase mb-1">Detail 2</label>
+                                        <textarea id="story-det2" class="w-full h-20 p-2 rounded border border-purple-200 focus:ring-2 focus:ring-purple-300 outline-none text-base mb-2" placeholder="What else happened?"></textarea>
+                                        <div class="flex items-center space-x-4 text-sm mt-2 pt-2 border-t border-purple-100">
+                                            <span class="font-bold text-slate-500">Does it work? (成功了嗎?)</span>
+                                            <label class="inline-flex items-center cursor-pointer hover:bg-white px-2 py-1 rounded transition"><input type="radio" name="work2" value="yes" class="form-radio text-green-500"><span class="ml-2 text-slate-700">Yes (O)</span></label>
+                                            <label class="inline-flex items-center cursor-pointer hover:bg-white px-2 py-1 rounded transition"><input type="radio" name="work2" value="no" class="form-radio text-red-500"><span class="ml-2 text-slate-700">No (X)</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border-2 border-blue-100 shadow-sm">
+                                <h3 class="text-lg font-bold text-blue-600 mb-2">4. The Ending</h3>
+                                <p class="text-sm text-slate-400 mb-3">How did the story finish?</p>
+                                <textarea id="story-end" class="w-full h-32 p-3 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-300 outline-none text-lg leading-relaxed"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between pt-4 items-center">
+                        <button onclick="switchTab('brainstorm')" class="text-slate-400 text-lg font-bold hover:text-slate-600">🠔 Back</button>
+                        <button onclick="compileStory(); switchTab('practice')" class="bg-green-500 hover:bg-green-600 text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105">Finish & Practice ➔</button>
+                    </div>
+                </div>
+
+                <!-- TAB 3: PRACTICE -->
+                <div id="content-practice" class="hidden-section fade-in flex flex-col md:flex-row gap-8">
+                    <div class="md:w-2/3 bg-white p-8 rounded-xl border-2 border-slate-100 shadow-inner">
+                        <h3 class="font-bold text-slate-400 uppercase text-sm mb-6 tracking-wider">Your Story Script</h3>
+                        <div id="final-script" class="text-2xl md:text-3xl leading-relaxed font-medium text-slate-800 font-serif">(Your story will appear here...)</div>
+                        <div class="mt-8"><button onclick="switchTab('build')" class="text-base text-orange-500 font-bold hover:underline">✎ Edit Story</button></div>
+                    </div>
+                    <div class="md:w-1/3 flex flex-col items-center justify-center bg-slate-900 text-white p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500"></div>
+                        <h3 class="text-xl font-bold mb-6 text-slate-300">Competition Timer</h3>
+                        <div style="position: relative; width: 180px; height: 180px;">
+                            <canvas id="timerCanvas" width="180" height="180"></canvas>
+                            <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-5xl font-bold font-mono">60</div>
+                        </div>
+                        <div class="mt-8 flex space-x-4 w-full">
+                            <button onclick="startTimer()" id="btn-start" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg text-lg font-bold shadow transition">Start ▶</button>
+                            <button onclick="resetTimer()" class="bg-slate-700 hover:bg-slate-600 text-white py-3 px-6 rounded-lg text-lg font-bold transition">↻</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Educational Chart (Pacing) -->
+        <section class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 max-w-4xl mx-auto">
+             <h3 class="text-center text-slate-500 font-bold uppercase tracking-wider text-sm mb-4">The Secret Formula</h3>
+             <div class="chart-container" style="height: 200px;">
+                <canvas id="pacingChart"></canvas>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-100 py-10 mt-12 text-center text-slate-400 text-base">
+        <p>Created for Storytelling Practice</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        function dismissOverlay() { document.getElementById('ios-help-overlay').style.display = 'none'; }
+
+        /* INSTRUCTION TO USER:
+           To add your own image, use 'charImgUrl' for the character (left) and 'setImgUrl' for the setting (right).
+           Paste your image link inside the quotes. 
+           Example: charImgUrl: "https://example.com/giraffe.jpg",
+           If you leave it as "", the card will show the Emoji icon instead.
+        */
+        const scenarios = [
+            {
+                id: 1, title: "The Clumsy Giraffe", subtitle: "At the Movie Theater", icon: "🦒", settingIcon: "🎬", color: "yellow",
+                charImgUrl: "https://duk.tw/39EHoV.png", // Paste Character Image URL Here
+                setImgUrl: "https://duk.tw/0Gige0.png", // Paste Setting Image URL Here
+                problemSentence: "He was too tall and clumsy to fit in the movie theater seats.",
+                words: { 
+                    char: ["Tall", "Clumsy", "Long neck", "Tripped", "Big feet", "Oops", "Sorry", "Bumped head", "Wobbly"], 
+                    setting: ["Cinema", "Popcorn", "Big screen", "Seats", "Dark", "Ticket", "Crowded aisle", "Sticky floor", "Soda"], 
+                    prob: ["Too tall", "Blocked view", "Stuck", "Knocked snacks", "Crash", "Legs"] 
+                },
+                starters: { 
+                    prob: "He walked in happily, but because he was so clumsy and tall, he tripped and blocked everyone's view.", 
+                    sol: "He felt bad about being awkward, so he looked for a place where he wouldn't bump into anyone.",
+                    det1: "He tried to sit down, but his long legs knocked over a bucket of popcorn.",
+                    det2: "He tried to crouch in the back, but he accidentally hit the projector with his head.",
+                    end: "Finally, he sat on the floor in the aisle, carefully folded his legs, and enjoyed the movie."
+                }
+            },
+            {
+                id: 2, title: "The Shy Ghost", subtitle: "At the Halloween Party", icon: "👻", settingIcon: "🎃", color: "purple",
+                charImgUrl: "https://duk.tw/FFEF00.png", setImgUrl: "https://duk.tw/Y3BCt1.png",
+                problemSentence: "He wanted to scare people but he was too shy to say 'Boo'.",
+                words: { 
+                    char: ["Shy", "Quiet voice", "Blushing", "Hides", "Nervous", "Cute", "Whisper", "Trembling", "Floating"], 
+                    setting: ["Party", "Spooky music", "Costumes", "Pumpkins", "Candy bowl", "Dance floor", "Balloons", "Haunted house", "Spider webs"], 
+                    prob: ["Scare", "Too quiet", "No voice", "Laughed", "Hid", "Silly"] 
+                },
+                starters: { 
+                    prob: "He floated into the party wanting to be scary, but he was so shy that he hid behind a pumpkin.", 
+                    sol: "He decided that if he was too nervous to scare people, he would try to make them smile instead.",
+                    det1: "He tried to yell 'BOO!', but it came out as a tiny, cute whisper.",
+                    det2: "He accidentally turned bright red because everyone was looking at him.",
+                    end: "In the end, everyone loved the shy little ghost and gave him the most candy."
+                }
+            },
+            {
+                id: 3, title: "The Confused Pirate", subtitle: "In the Supermarket", icon: "🏴‍☠️", settingIcon: "🛒", color: "blue",
+                charImgUrl: "https://duk.tw/EsZdTy.png", setImgUrl: "https://duk.tw/c8NUGt.png",
+                problemSentence: "He didn't understand how to pay because he only had ancient gold.",
+                words: { 
+                    char: ["Confused", "Old-fashioned", "Gold coins", "Captain", "Wooden leg", "Parrot", "Rusty sword", "Lost", "Ancient"], 
+                    setting: ["Supermarket", "Fresh fruit", "Counter", "Cart", "Automatic door", "Cash register", "Paper money", "Bags", "Scanner"], 
+                    prob: ["Wrong money", "Gold", "Rejected", "Pay", "Modern", "Confused"] 
+                },
+                starters: { 
+                    prob: "He marched to the counter, but he was confused when the cashier wouldn't take his heavy gold coins.", 
+                    sol: "He needed to find a way to trade his ancient treasure for the apples he wanted.",
+                    det1: "He shouted 'Take my gold!', but the confused cashier just shook her head.",
+                    det2: "He realized he needed to go to the bank to change his treasure into paper money.",
+                    end: "Finally, he returned with dollars, bought his groceries, and sailed away on his cart."
+                }
+            },
+            {
+                id: 4, title: "The Sneezing Dragon", subtitle: "At the Library", icon: "🐉", settingIcon: "📚", color: "red",
+                charImgUrl: "https://duk.tw/T0f4kJ.png", setImgUrl: "https://duk.tw/oKnZFu.png",
+                problemSentence: "He had a cold and kept accidentally breathing fire on the books.",
+                words: { 
+                    char: ["Sick", "Sneeze", "Fire", "Runny nose", "Green", "Itchy", "Smoke", "Hot breath", "Sorry"], 
+                    setting: ["Library", "Shelves", "Pile of books", "Librarian", "Quiet corner", "Carpet", "Table", "Silence", "Pages"], 
+                    prob: ["Burnt", "Achoo", "Smoke cloud", "Fire", "Scared", "Accident"] 
+                },
+                starters: { 
+                    prob: "He tried to read quietly, but he had a terrible cold and felt a fiery sneeze coming.", 
+                    sol: "He had to act very quickly to stop his fire from burning the library books.",
+                    det1: "His nose twitched and a small puff of smoke came out of his ears.",
+                    det2: "He quickly grabbed a metal trash can just as he sneezed a giant flame.",
+                    end: "The librarian gave him a tissue, and he promised to read outside until his cold was gone."
+                }
+            },
+            {
+                id: 5, title: "The Rusty Robot", subtitle: "At the Beach", icon: "🤖", settingIcon: "🏖️", color: "slate",
+                charImgUrl: "https://duk.tw/xo87Lb.png", setImgUrl: "https://duk.tw/ATzwD1.png",
+                problemSentence: "He wanted to swim but his old metal body would rust instantly.",
+                words: { 
+                    char: ["Rusty", "Stiff joints", "Squeaky", "Old metal", "Heavy", "Gears", "Water phobia", "Sparks", "Slow"], 
+                    setting: ["Beach", "Ocean", "Hot sand", "Waves", "Umbrella", "Seashells", "Sandcastle", "Swimsuits", "Bucket"], 
+                    prob: ["Water", "Rust", "Stuck", "Sink", "Heavy", "Broken"] 
+                },
+                starters: { 
+                    prob: "He watched the ocean sadly because his rusty joints would lock up if he touched the water.", 
+                    sol: "He decided to find a way to have fun on the dry sand without getting wet.",
+                    det1: "He tried to run on the beach, but his squeaky knees scared the seagulls.",
+                    det2: "He sat down and used his stiff metal hands to build a perfect sandcastle.",
+                    end: "He won the sandcastle contest and stayed safe and dry under an umbrella."
+                }
+            },
+            {
+                id: 6, title: "The Clumsy Superhero", subtitle: "In the Bakery", icon: "🦸", settingIcon: "🍩", color: "indigo",
+                charImgUrl: "https://duk.tw/p4rJle.png", setImgUrl: "https://duk.tw/gDj7bJ.png",
+                problemSentence: "He was so strong and fast that he kept breaking the delicate cakes.",
+                words: { 
+                    char: ["Strong", "Fast", "Clumsy", "Cape", "Muscles", "Accident", "Flying", "Heavy steps", "Hero"], 
+                    setting: ["Bakery", "Cakes", "Glass case", "Flour", "Oven", "Cookies", "Baker", "Sweet smell", "Cream puffs"], 
+                    prob: ["Smashed", "Knocked over", "Broke glass", "Crushed", "Power", "Mess"] 
+                },
+                starters: { 
+                    prob: "He flew in to buy a snack, but his long cape knocked over a tower of donuts.", 
+                    sol: "He realized he needed to move very slowly to stop breaking things in the small shop.",
+                    det1: "He tried to pick up a cupcake, but he accidentally crushed it with his super strength.",
+                    det2: "He decided to stand still and point at the cake he wanted instead of touching it.",
+                    end: "He paid for the broken donuts and ate his cake carefully outside."
+                }
+            },
+            {
+                id: 7, title: "The Hungry Astronaut", subtitle: "On the Moon", icon: "🚀", settingIcon: "🌑", color: "slate",
+                charImgUrl: "https://duk.tw/5kWhir.png", setImgUrl: "https://duk.tw/2R0sSj.png",
+                problemSentence: "He opened his lunchbox but the zero gravity made his food float away.",
+                words: { char: ["Hungry", "Floating", "Heavy suit", "Thick gloves", "Slow", "Catch", "Helmet", "Drifting", "Starving"], setting: ["Moon", "Zero gravity", "Rocket", "Dark space", "Earth", "Dust", "Crater", "Lunchbox", "Stars"], 
+                prob: ["Flew away", "Can't grab", "Floating food", "Drifting", "Hard to move", "Lost"] },
+                starters: { prob: "He was starving after his moonwalk, but when he opened his box, his sandwich floated away.", sol: "He had to use his astronaut training to catch his lunch before it was gone forever.", det1: "He tried to jump up, but he moved too slowly in his heavy suit.", det2: "He pushed off a moon rock and swam through the air to grab the bread.", end: "He finally caught his lunch and ate it quickly before it could escape again." }
+            },
+            {
+                id: 8, title: "The Dry Mermaid", subtitle: "On the School Bus", icon: "🧜‍♀️", settingIcon: "🚌", color: "teal",
+                charImgUrl: "https://duk.tw/PwUomy.png", setImgUrl: "https://duk.tw/rS05kW.png",
+                problemSentence: "She was very uncomfortable because her tail was drying out on the bus.",
+                words: { char: ["Dry tail", "Itchy", "Thirsty", "Fish tail", "Uncomfortable", "Needs water", "Gasping", "Heavy", "Weak"], setting: ["Bus", "Bumpy road", "Driver", "Seats", "School bag", "Stop sign", "Students", "Window", "Hot air"], 
+                prob: ["Dried out", "No legs", "Small seats", "Sliding", "Water", "Stuck"] },
+                starters: { prob: "She hopped onto the bus, but she had a big problem: her tail was getting dry and itchy.", sol: "She asked the driver for help to stay wet until she got to school.", det1: "She tried to squeeze into a seat, but her tail was too long and dry.", det2: "She used her water bottle to keep her scales wet and shiny.", end: "She arrived at school feeling much better and rolled in her wheelchair to class." }
+            },
+            {
+                id: 9, title: "The Sneezy Detective", subtitle: "In the Garden", icon: "🕵️‍♂️", settingIcon: "🌻", color: "stone",
+                charImgUrl: "https://duk.tw/P73EyO.png", setImgUrl: "https://duk.tw/7fRX7T.png",
+                problemSentence: "He was trying to find clues but he was allergic to the flowers.",
+                words: { char: ["Allergy", "Sneezing", "Watery eyes", "Itchy nose", "Magnifying glass", "Smart", "Tissue", "Red nose", "Sniffling"], setting: ["Garden", "Roses", "Grass", "Bees", "Pollen", "Path", "Hidden clue", "Sun", "Branch"], 
+                prob: ["Can't see", "Loud sneeze", "Scared birds", "Lost clue", "Allergy", "Blurry"] },
+                starters: { prob: "He was looking for a lost ring, but the pollen made him sneeze so hard he couldn't see.", sol: "He needed to protect his nose so he could finish his job.", det1: "He sneezed loudly and scared away the birds.", det2: "He put a clothespin on his nose to stop smelling the flowers.", end: "He stopped sneezing, found the shiny ring under a rose, and solved the case." }
+            },
+            {
+                id: 10, title: "The Forgetful Chef", subtitle: "In the Jungle", icon: "👨‍🍳", settingIcon: "🌴", color: "green",
+                charImgUrl: "https://duk.tw/nIXEry.png", setImgUrl: "https://duk.tw/9lWNuj.png",
+                problemSentence: "He was cooking a great meal but forgot to bring his pots and pans.",
+                words: { char: ["Forgetful", "Silly", "Chef hat", "Apron", "Confused", "Hungry", "Spoon", "Scatterbrained", "Cooking"], setting: ["Jungle", "Vines", "River", "Campfire", "Banana leaves", "Coconuts", "Animals", "Rainforest", "Mud"], 
+                prob: ["No pots", "Forgot pans", "Boil", "Missing tools", "Trouble", "Improvise"] },
+                starters: { prob: "He had all the ingredients for soup, but he realized he had forgotten his pot at home.", sol: "He had to be creative and use things from the jungle to cook.", det1: "He looked around and found a large, clean coconut shell.", det2: "He used two stick as chopsticks to stir the vegetables.", end: "The jungle soup was delicious, even though he cooked it in a shell." }
+            },
+            {
+                id: 11, title: "The Old Wizard", subtitle: "At the Zoo", icon: "🧙‍♂️", settingIcon: "🦁", color: "purple",
+                charImgUrl: "https://duk.tw/xzfDe1.png", setImgUrl: "https://duk.tw/7J6qFK.png",
+                problemSentence: "His eyesight was bad and he cast the wrong spell on the lion.",
+                words: { char: ["Old", "Bad eyesight", "Shaky hands", "Wand", "Beard", "Glasses", "Confused", "Robe", "Hat"], setting: ["Zoo", "Lion cage", "Bars", "Zookeeper", "Path", "Signs", "Animal sounds", "Fence", "Visitors"], 
+                prob: ["Wrong spell", "Mistake", "Changed", "Zap", "Pink", "Accident"] },
+                starters: { prob: "He squinted at the lion and waved his wand, but because he couldn't see well, he made a mistake.", sol: "He needed to put on his glasses to fix the magical mess.", det1: "The lion turned bright pink and started floating.", det2: "The wizard cleaned his glasses and read the spell book carefully.", end: "He turned the lion back to normal and the zookeeper never noticed." }
+            },
+            {
+                id: 12, title: "The Hot Penguin", subtitle: "In the Desert", icon: "🐧", settingIcon: "🌵", color: "orange",
+                charImgUrl: "https://duk.tw/NIZ1nd.png", setImgUrl: "https://duk.tw/9jh0HI.png",
+                problemSentence: "He was wearing a winter tuxedo and was melting in the heat.",
+                words: { char: ["Hot", "Sweaty", "Dizzy", "Tuxedo", "Waddling", "Thirsty", "Panting", "Ice cream", "Overheated"], setting: ["Desert", "Sun", "Sand", "Cactus", "Dunes", "No water", "Sky", "Heat waves", "Camel"], 
+                prob: ["Melting", "Heat", "Dehydrated", "Fainting", "No shade", "Ice"] },
+                starters: { prob: "The sun was beating down on his black feathers and he felt like he was going to melt.", sol: "He needed to find something cold immediately to survive.", det1: "He tried to hide in the shadow of a small rock.", det2: "He found an oasis and jumped straight into the cool water.", end: "He stayed in the water until night came and it was cool enough to walk." }
+            },
+            {
+                id: 13, title: "The Tiny Fairy", subtitle: "In the Library", icon: "🧚‍♀️", settingIcon: "📖", color: "pink",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "She was too small to turn the heavy pages of the book.",
+                words: { char: ["Tiny", "Weak arms", "Sparkly wings", "Dust", "Frustrated", "Small", "Flying", "Pushing", "Light"], setting: ["Library", "Giant books", "Heavy pages", "Desk", "Lamp", "Dust", "Quiet", "Hard cover", "Paper"], 
+                prob: ["Heavy page", "Can't turn", "Stuck", "Big book", "Hard work", "Magic"] },
+                starters: { prob: "She landed on the storybook, but she was so tiny that the page felt like a heavy wall.", sol: "She decided to use her magic dust to help her read.", det1: "She pushed with all her might, but the paper didn't move.", det2: "She sprinkled floating dust on the corner of the page.", end: "The page lifted up gently, and she sat underneath it to read the next chapter." }
+            },
+            {
+                id: 14, title: "The Scary Dinosaur", subtitle: "At a Restaurant", icon: "🦖", settingIcon: "🍽️", color: "green",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He just wanted a salad but he accidentally scared all the waiters.",
+                words: { char: ["Scary", "Sharp teeth", "Giant", "Roar", "Friendly", "Hungry", "Claws", "Stomping", "Green"], setting: ["Restaurant", "Tablecloth", "Menu", "Waiter", "Kitchen", "Plate", "Fork", "Water", "Napkin"], 
+                prob: ["Ran away", "Screaming", "Hiding", "Empty", "Lonely", "Misunderstood"] },
+                starters: { prob: "He smiled to order his food, but showed his sharp teeth and everyone ran away screaming.", sol: "He tried to show them he was a nice dinosaur, not a mean one.", det1: "He put a napkin on his lap to look polite.", det2: "He left a big tip on the table before he even ate.", end: "The waiter came back slowly, and the dinosaur enjoyed his salad peacefully." }
+            },
+            {
+                id: 15, title: "The Hairy Monster", subtitle: "At the Beauty Salon", icon: "👹", settingIcon: "💇", color: "red",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "His hair was so thick and messy that it broke the scissors.",
+                words: { char: ["Hairy", "Messy fur", "Knots", "Ugly", "Giant", "Thick coat", "Wild", "Dirty", "Strong"], setting: ["Salon", "Mirror", "Scissors", "Chair", "Shampoo", "Comb", "Dryer", "Towels", "Hairspray"], 
+                prob: ["Broke scissors", "Stuck", "Tough hair", "Snap", "Fail", "Impossible"] },
+                starters: { prob: "He sat in the chair, but his fur was so thick that the barber's scissors snapped in half.", sol: "They needed to find a stronger tool to cut his wild hair.", det1: "The barber tried to brush it, but the comb got stuck forever.", det2: "They went to the garden shed to get a pair of hedge clippers.", end: "The garden tools worked perfectly, and the monster looked handsome and neat." }
+            },
+            {
+                id: 16, title: "The Clean Cat", subtitle: "In the Swimming Pool", icon: "🐱", settingIcon: "🏊", color: "blue",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He hated water but he accidentally fell into the pool.",
+                words: { char: ["Clean", "Hates water", "Fluffy", "Panicked", "Claws", "Wet", "Shivering", "Meow", "Mad"], setting: ["Pool", "Deep water", "Tiles", "Chlorine", "Ladder", "Raft", "Splash", "Sun", "Deck"], 
+                prob: ["Wet", "Splash", "Sinking", "Cold", "Can't swim", "Escape"] },
+                starters: { prob: "He was walking gracefully on the edge, but he slipped and fell into the wet, horrible water.", sol: "He had to get out instantly because he hated being wet.", det1: "He splashed wildly and made a huge mess.", det2: "He saw a floating raft and climbed onto it.", end: "He drifted to the side, jumped out, and spent three hours licking himself dry." }
+            },
+            {
+                id: 17, title: "The Elegant Princess", subtitle: "On a Farm", icon: "👸", settingIcon: "🚜", color: "pink",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "She was wearing her best dress and was afraid of the mud.",
+                words: { char: ["Elegant", "Gown", "Crown", "Clean shoes", "Worried", "Tiptoe", "Jewels", "Gloves", "Manners"], setting: ["Farm", "Pig pen", "Barn", "Hay", "Tractor", "Fence", "Animals", "Bad smell", "Mud"], 
+                prob: ["Mud", "Stains", "Dirty shoes", "Ruined", "Smell", "Splash"] },
+                starters: { prob: "She wanted to see the pigs, but the ground was muddy and she didn't want to ruin her gown.", sol: "She looked for a way to walk without touching the dirt.", det1: "She tried to walk on the fence, but she almost fell.", det2: "The farmer gave her a pair of giant yellow rain boots.", end: "She wore the boots with her fancy dress and fed the pigs happily." }
+            },
+            {
+                id: 18, title: "The Silly Alien", subtitle: "In the Supermarket", icon: "👽", settingIcon: "🧼", color: "lime",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He thought the soap was cheese and tried to eat it.",
+                words: { char: ["Silly", "Mistake", "Green", "Confused", "Hungry", "Weird taste", "Laughing", "Eating soap", "Bubbles"], setting: ["Supermarket", "Cans", "Soap bar", "Checkout", "Cart", "Aisle", "Lights", "Box", "Money"], 
+                prob: ["Ate soap", "Mistake", "Yuck", "Sick", "Bubbles", "Wrong"] },
+                starters: { prob: "He was hungry and grabbed a bar of soap, thinking it was a delicious square cheese.", sol: "He realized his mistake when bubbles started coming out of his mouth.", det1: "He burped and a giant bubble floated into the air.", det2: "The shoppers laughed as he spit out the soapy taste.", end: "He found the real cheese aisle and learned that food doesn't make bubbles." }
+            },
+            {
+                id: 19, title: "The Lost Cowboy", subtitle: "On Mars", icon: "🤠", settingIcon: "🪐", color: "orange",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He was looking for his horse but he was on the wrong planet.",
+                words: { char: ["Lost", "Brave", "Confused", "Hat", "Lasso", "Boots", "Walking", "Searching", "Dusty"], setting: ["Mars", "Red rocks", "Space", "Dust", "Craters", "Alien home", "Stars", "Planet", "Cold"], 
+                prob: ["Where?", "Gone", "No map", "Far", "Stranger", "Wrong planet"] },
+                starters: { prob: "He walked through the red dust looking for his horse, but realized he was totally lost.", sol: "He decided to ask a local alien for directions back to Earth.", det1: "He tried to lasso a rock, thinking it was a cow.", det2: "A green Martian showed him where to park his spaceship.", end: "He didn't find his horse, but he rode a space-rover instead." }
+            },
+            {
+                id: 20, title: "The Pale Vampire", subtitle: "At a Sunny Park", icon: "🧛", settingIcon: "☀️", color: "slate",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He wanted to play but the sun was burning his skin.",
+                words: { char: ["Pale", "Weak", "Scared of sun", "Sunburn", "Hot", "Cape", "Fangs", "Shadow", "Hurt eyes"], setting: ["Park", "Sun", "Grass", "Slide", "Swings", "Daytime", "Trees", "Birds", "Bench"], 
+                prob: ["Burning", "Bright", "Pain", "Red skin", "Hide", "Smoke"] },
+                starters: { prob: "He stepped onto the grass, but the sun was so bright it started to smoke his pale skin.", sol: "He had to cover himself up completely to play on the slide.", det1: "He tried to run fast between the shadows of the trees.", det2: "He put on a huge hat, sunglasses, and lots of sunscreen.", end: "He looked funny wrapped in clothes, but he played safely until sunset." }
+            },
+            {
+                id: 21, title: "The Proud Lion", subtitle: "At the Hairdresser", icon: "🦁", settingIcon: "✂️", color: "yellow",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He was very proud of his mane but the hairdresser cut it too short.",
+                words: { char: ["Proud", "Vain", "Handsome", "Mane", "Shocked", "Roar", "Bald", "Mirror", "Sad"], setting: ["Salon", "Comb", "Spray", "Mirror", "Scissors", "Chair", "Sink", "Dryer", "Hair on floor"], 
+                prob: ["Too short", "Ugly", "Mistake", "Gone", "Cry", "Not a king"] },
+                starters: { prob: "He went in for a trim, but when he looked in the mirror, his beautiful mane was gone!", sol: "He had to find a way to look like a King again.", det1: "He roared loudly because he felt embarrassed.", det2: "He bought a fancy wig to wear until his hair grew back.", end: "He walked out with his new wig, acting proud again." }
+            },
+            {
+                id: 22, title: "The Clumsy Elephant", subtitle: "In a Porcelain Shop", icon: "🐘", settingIcon: "🏺", color: "gray",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He was too big and kept knocking over expensive vases.",
+                words: { char: ["Clumsy", "Giant", "Heavy steps", "Trunk", "Oops", "Crash", "Scared", "Tight squeeze", "Turning"], setting: ["Shop", "Vases", "Glass cups", "Shelves", "China", "Plates", "Delicate", "Aisle", "Breakable"], 
+                prob: ["Smashed", "Crash", "Falling", "Ruined", "Small space", "Trapped"] },
+                starters: { prob: "He tried to be careful, but his big body bumped into a shelf and a vase wobbled.", sol: "He decided to stop moving and ask for help to get out.", det1: "He held his breath and pulled his trunk in tight.", det2: "The shop owner guided him backwards very slowly.", end: "He escaped without breaking anything else and decided to shop outside." }
+            },
+            {
+                id: 23, title: "The Sleepy Owl", subtitle: "At a Disco", icon: "🦉", settingIcon: "🪩", color: "indigo",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He was nocturnal and trying to dance, but he kept falling asleep.",
+                words: { char: ["Sleepy", "Tired eyes", "Yawn", "Night bird", "Eyes closed", "Slow dance", "Bed", "Feathers", "Dreaming"], setting: ["Disco", "Lights", "Music", "Dance floor", "Speakers", "Ball", "People", "Late night", "DJ"], 
+                prob: ["Asleep", "Nap", "Loud", "Falling", "Snoring", "Wake up"] },
+                starters: { prob: "He was on the dance floor, but he was so tired that he fell asleep standing up.", sol: "He needed to wake himself up to enjoy the party.", det1: "He snored loudly over the music.", det2: "He drank a cold glass of water and splashed his face.", end: "He danced for one hour and then flew home to his cozy bed." }
+            },
+            {
+                id: 24, title: "The Melting Snowman", subtitle: "On a Tropical Island", icon: "⛄", settingIcon: "🏝️", color: "cyan",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He went on vacation but the sun started to turn him into water.",
+                words: { char: ["Melting", "Dripping", "Hot", "Smaller", "Carrot nose", "Stick arms", "Panic", "Puddle", "Soft"], setting: ["Island", "Sun", "Palm tree", "Sand", "Ocean", "Coconut", "Heat", "Beach", "Umbrella"], 
+                prob: ["Melting", "Drip", "Gone", "Hot", "Shrinking", "Help"] },
+                starters: { prob: "He lay on the beach chair, but he felt his legs turning into a puddle of water.", sol: "He needed to find a freezer immediately to stay frozen.", det1: "His carrot nose fell off into the sand.", det2: "He ran into the hotel kitchen and jumped into the ice box.", end: "He spent his holiday in the freezer, happy and cold." }
+            },
+            {
+                id: 25, title: "The Brave Ant", subtitle: "In a Giant's Kitchen", icon: "🐜", settingIcon: "👟", color: "stone",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He was tiny but brave, facing a giant shoe that tried to squash him.",
+                words: { char: ["Brave", "Tiny", "Fast", "Strong legs", "Hero", "Dodging", "Running", "Scared", "Hiding"], setting: ["Kitchen", "Table", "Food", "Giant human", "Plate", "Crumb", "Floor", "Chair", "Cheese"], 
+                prob: ["Squash", "Step", "Shoe", "Run", "Crushed", "Hide"] },
+                starters: { prob: "He was carrying a crumb when a giant shadow fell over him—a shoe was coming down!", sol: "He used his speed to dodge the shoe and save his food.", det1: "He zig-zagged left and right to confuse the giant.", det2: "He hid inside a small crack in the floor where he was safe.", end: "He waited for the giant to leave and carried his prize home like a hero." }
+            },
+            {
+                id: 26, title: "The Busy Bee", subtitle: "In a Flower Shop", icon: "🐝", settingIcon: "🌷", color: "yellow",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He was working hard but got trapped inside the glass shop.",
+                words: { char: ["Busy", "Fast", "Buzz", "Confused", "Trapped", "Working hard", "Honey", "Wings", "Tired"], setting: ["Flower shop", "Window", "Roses", "Glass", "Vase", "Bucket", "Door", "Florist", "Smell"], 
+                prob: ["Stuck", "Hit window", "Glass wall", "Bumped", "Closed", "Out"] },
+                starters: { prob: "He was trying to collect pollen, but he kept bumping into the invisible glass window.", sol: "He had to find an open door to get back to his hive.", det1: "He buzzed loudly to call for help.", det2: "The florist saw him and opened the front door.", end: "He flew out fast, happy to be back in the fresh air." }
+            },
+            {
+                id: 27, title: "The Bad Magician", subtitle: "At a Birthday Party", icon: "🎩", settingIcon: "🎂", color: "teal",
+                charImgUrl: "", setImgUrl: "",
+                problemSentence: "He tried to do magic tricks but everything went wrong.",
+                words: { char: ["Bad magician", "Clumsy", "Silly tricks", "Failed", "Wand", "Hat", "Rabbit", "Oops", "Sorry"], setting: ["Party", "Cake", "Balloons", "Children", "Gifts", "Living room", "Candles", "Music", "Games"], 
+                prob: ["Failed", "Wrong trick", "Laughing", "Mess", "Ran away", "Escaped"] },
+                starters: { prob: "He said 'Abra Cadabra', but instead of a rabbit, water sprayed out of his hat!", sol: "He decided to be a funny clown instead of a serious magician.", det1: "The children laughed when his cards fell on the floor.", det2: "He tripped over his own cape and made them laugh more.", end: "The kids loved the show because it was so funny, even if the magic failed." }
+            }
+        ];
+
+        let currentScenarioId = null;
+        let pacingChartInstance = null;
+        let timerInterval = null;
+        let timeLeft = 60;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGrid();
+            initPacingChart();
+            drawTimerCircle(1);
+            setTimeout(dismissOverlay, 500); 
+        });
+
+        // --- GRID GENERATION ---
+        function initGrid() {
+            const grid = document.getElementById('scenario-grid');
+            grid.innerHTML = '';
+            
+            // Set 2 columns per row
+            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-10";
+
+            scenarios.forEach(s => {
+                const colorMap = {
+                    yellow: 'border-yellow-400 hover:bg-yellow-50',
+                    purple: 'border-purple-400 hover:bg-purple-50',
+                    blue: 'border-blue-400 hover:bg-blue-50',
+                    red: 'border-red-400 hover:bg-red-50',
+                    slate: 'border-slate-400 hover:bg-slate-50',
+                    indigo: 'border-indigo-400 hover:bg-indigo-50',
+                    teal: 'border-teal-400 hover:bg-teal-50',
+                    green: 'border-green-400 hover:bg-green-50',
+                    orange: 'border-orange-400 hover:bg-orange-50',
+                    pink: 'border-pink-400 hover:bg-pink-50',
+                    lime: 'border-lime-400 hover:bg-lime-50',
+                    stone: 'border-stone-400 hover:bg-stone-50',
+                    gray: 'border-gray-400 hover:bg-gray-50',
+                    cyan: 'border-cyan-400 hover:bg-cyan-50'
+                };
+                
+                const bgClass = colorMap[s.color] || 'border-slate-200 hover:bg-slate-50';
+                
+                // Helper to remove prefixes for cleaner display under images
+                const cleanTitle = s.title.replace(/^The\s+/i, '');
+                const cleanSubtitle = s.subtitle.replace(/^(At|In|On)\s+(the|a|an)?\s*/i, '');
+
+                // --- SLOT 1: Character (Left) ---
+                let charVisual;
+                if (s.charImgUrl && s.charImgUrl.trim() !== "") {
+                    charVisual = `<img src="${s.charImgUrl}" class="w-full h-full object-cover">`;
+                } else {
+                    charVisual = `<div class="text-7xl group-hover:scale-110 transition transform filter drop-shadow-sm">${s.icon}</div>`;
+                }
+
+                // --- SLOT 2: Setting (Right) ---
+                let setVisual;
+                if (s.setImgUrl && s.setImgUrl.trim() !== "") {
+                    setVisual = `<img src="${s.setImgUrl}" class="w-full h-full object-cover">`;
+                } else {
+                    setVisual = `<div class="text-7xl group-hover:scale-110 transition transform filter drop-shadow-sm delay-75">${s.settingIcon || '📍'}</div>`;
+                }
+
+                const card = document.createElement('button');
+                // Increased height
+                card.className = `card-hover bg-white rounded-2xl shadow-sm border-b-4 text-left transition group ${bgClass} flex flex-col h-full min-h-[400px] overflow-hidden`;
+                card.onclick = () => selectScenario(s.id);
+                
+                const probPreview = s.problemSentence; 
+                
+                // Card HTML Structure
+                card.innerHTML = `
+                    <div class="w-full flex border-b border-slate-100">
+                        <!-- Left Slot -->
+                        <div class="w-1/2 border-r border-slate-100 flex flex-col bg-slate-50 aspect-[4/3]">
+                            <div class="w-full h-full relative flex items-center justify-center overflow-hidden">
+                                ${charVisual}
+                            </div>
+                            <div class="w-full p-2 bg-indigo-50 border-t border-slate-100 flex items-center justify-center text-center">
+                                <h3 class="font-bold text-lg text-indigo-900 leading-tight">${cleanTitle}</h3>
+                            </div>
+                        </div>
+                        <!-- Right Slot -->
+                        <div class="w-1/2 flex flex-col bg-slate-50 aspect-[4/3]">
+                            <div class="w-full h-full relative flex items-center justify-center overflow-hidden">
+                                ${setVisual}
+                            </div>
+                            <div class="w-full p-2 bg-emerald-50 border-t border-slate-100 flex items-center justify-center text-center">
+                                <p class="font-bold text-lg text-emerald-700 leading-tight">${cleanSubtitle}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 flex-1 flex flex-col justify-center bg-white">
+                        <div class="flex items-start gap-4">
+                            <span class="text-red-500 text-3xl mt-1">⚠️</span>
+                            <div>
+                                <span class="block uppercase tracking-wider text-red-500 text-sm font-bold mb-1">The Problem</span>
+                                <p class="text-xl text-slate-700 font-bold leading-snug">
+                                    ${probPreview}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- CHARTS ---
+        function initPacingChart() {
+            const ctx = document.getElementById('pacingChart').getContext('2d');
+            pacingChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Prob/Sol (30s)', 'Ending (30s)'],
+                    datasets: [{
+                        data: [30, 30],
+                        backgroundColor: ['#f87171', '#4ade80'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+        }
+
+        // --- LOGIC ---
+        function selectScenario(id) {
+            currentScenarioId = id;
+            const data = scenarios.find(s => s.id === id);
+            
+            const header = document.getElementById('workspace-header');
+            const colorClasses = {
+                yellow: 'bg-yellow-500', purple: 'bg-purple-600', blue: 'bg-blue-600', red: 'bg-red-500',
+                slate: 'bg-slate-600', indigo: 'bg-indigo-600', teal: 'bg-teal-600', green: 'bg-green-600',
+                orange: 'bg-orange-500', pink: 'bg-pink-500', lime: 'bg-lime-600', stone: 'bg-stone-500',
+                gray: 'bg-gray-600', cyan: 'bg-cyan-600'
+            };
+            Object.values(colorClasses).forEach(c => header.classList.remove(c));
+            header.classList.add(colorClasses[data.color] || 'bg-slate-800');
+
+            document.getElementById('scenario-title').innerText = `${data.title}: ${data.subtitle}`;
+            document.getElementById('scenario-icon').innerText = data.icon;
+            document.getElementById('workspace').classList.remove('hidden-section');
+            
+            populateTags('words-character', data.words.char);
+            populateTags('words-setting', data.words.setting);
+            populateTags('words-problem', data.words.prob); 
+            
+            document.getElementById('brainstorm-char-text').innerText = data.title;
+            document.getElementById('brainstorm-set-text').innerText = data.subtitle;
+            document.getElementById('brainstorm-prob-text').innerText = data.problemSentence;
+
+            document.getElementById('story-prob').value = data.starters.prob || "";
+            document.getElementById('story-sol').value = data.starters.sol || "";
+            document.getElementById('story-det1').value = data.starters.det1 || "";
+            document.getElementById('story-det2').value = data.starters.det2 || "";
+            document.getElementById('story-end').value = data.starters.end || "";
+            
+            document.querySelectorAll('input[type=radio]').forEach(el => el.checked = false);
+
+            switchTab('brainstorm');
+            document.getElementById('workspace').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function populateTags(containerId, words) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            words.forEach(word => {
+                const tag = document.createElement('span');
+                tag.className = 'keyword-tag bg-white border border-slate-200 px-4 py-2 rounded-full text-base text-slate-600 shadow-sm hover:shadow-md text-left whitespace-nowrap h-auto';
+                tag.innerText = word;
+                tag.onclick = function() { this.classList.toggle('selected'); };
+                container.appendChild(tag);
+            });
+        }
+
+        function switchTab(tabName) {
+            ['brainstorm', 'build', 'practice'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden-section');
+                document.getElementById(`tab-${t}`).classList.remove('step-active', 'text-orange-600');
+                document.getElementById(`tab-${t}`).classList.add('text-slate-500');
+            });
+            document.getElementById(`content-${tabName}`).classList.remove('hidden-section');
+            document.getElementById(`tab-${tabName}`).classList.add('step-active', 'text-orange-600');
+            document.getElementById(`tab-${tabName}`).classList.remove('text-slate-500');
+        }
+
+        function compileStory() {
+            const prob = document.getElementById('story-prob').value;
+            const sol = document.getElementById('story-sol').value;
+            const det1 = document.getElementById('story-det1').value;
+            const det2 = document.getElementById('story-det2').value;
+            const end = document.getElementById('story-end').value;
+
+            document.getElementById('final-script').innerHTML = `
+                <div class="space-y-4">
+                    <p><strong class="text-red-500 block text-sm uppercase">The Problem</strong> ${prob}</p>
+                    <p><strong class="text-green-500 block text-sm uppercase">The Solution</strong> ${sol}</p>
+                    <p><strong class="text-purple-500 block text-sm uppercase">Details</strong> ${det1} ${det2}</p>
+                    <p><strong class="text-blue-500 block text-sm uppercase">Ending</strong> ${end}</p>
+                </div>
+            `;
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+                document.getElementById('workspace').classList.add('hidden-section');
+                currentScenarioId = null;
+            }, 500);
+        }
+
+        function drawTimerCircle(percentage) {
+            const canvas = document.getElementById('timerCanvas');
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2, cy = canvas.height / 2, r = 80;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+            ctx.lineWidth = 12; ctx.strokeStyle = '#334155'; ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 1.5*Math.PI, (1.5*Math.PI) + (2*Math.PI*percentage));
+            ctx.lineWidth = 12;
+            ctx.strokeStyle = percentage < 0.25 ? '#ef4444' : percentage < 0.5 ? '#eab308' : '#22c55e';
+            ctx.lineCap = 'round'; ctx.stroke();
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            const btn = document.getElementById('btn-start');
+            btn.innerText = "Running..."; btn.classList.add('opacity-50');
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-display').innerText = timeLeft;
+                drawTimerCircle(timeLeft / 60);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval); timerInterval = null;
+                    document.getElementById('timer-display').innerText = "Done!";
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval); timerInterval = null; timeLeft = 60;
+            document.getElementById('timer-display').innerText = "60"; drawTimerCircle(1);
+            const btn = document.getElementById('btn-start');
+            btn.innerText = "Start ▶"; btn.classList.remove('opacity-50');
+        }
+    </script>
+</body>
+</html>
